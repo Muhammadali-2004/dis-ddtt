@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: dis-ddtt
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /index.php
