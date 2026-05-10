@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 <title>Дохил шудан — Архиви Корҳои Илмӣ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="<?= url('assets/css/style.css') ?>">
+<link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= @filemtime(__DIR__.'/assets/css/style.css') ?: time() ?>">
 </head>
 <body>
 <div class="auth-bg">

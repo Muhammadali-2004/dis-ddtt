@@ -145,7 +145,7 @@ include 'includes/header.php';
         </div>
         <div class="card-b">
           <?php if(empty($my_works)): ?>
-          <div class="empty"><div class="ic">∅</div><h3>Кор вуҷуд надорад</h3>
+          <div class="empty"><div class="ic">❍</div><h3>Кор вуҷуд надорад</h3>
           <?php if(is_student()): ?>
           <a href="<?= url('upload.php') ?>" class="btn btn-pri" style="margin-top:14px">+ Кори нав</a>
           <?php endif; ?>

@@ -23,13 +23,13 @@ function nav_a($href, $label, $cur, $id) {
 <title><?= isset($page_title) ? e($page_title).' — ' : '' ?><?= SITE_NAME ?> · ДИС ДДТТ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="<?= url('assets/css/style.css') ?>">
+<link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= @filemtime(__DIR__.'/../assets/css/style.css') ?: time() ?>">
 </head>
 <body>
 
 <header class="site-header">
   <div class="hdr-top">
-    Донишкадаи Иқтисоди Сохтмон (ДИС) — Донишгоҳи Давлатии Технологии Тоҷикистон
+    Донишкадаи Иқтисод ва Савдои (ДИС ДДТТ) — Донишгоҳи Давлатии Технологии Тоҷикистон
   </div>
   <div class="hdr-row">
     <a href="<?= url('index.php') ?>" class="logo">

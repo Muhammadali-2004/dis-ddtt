@@ -62,7 +62,7 @@ include 'includes/header.php';
     <div class="card-b">
       <form method="POST" enctype="multipart/form-data">
         <div class="drop-zone" id="dz" onclick="document.getElementById('fi').click()">
-          <div class="ic">↑</div>
+          <div class="ic">⇡</div>
           <h4>Файлро ин ҷо кашед ё клик кунед</h4>
           <p>PDF · DOC · DOCX — то 20 МБ</p>
         </div>

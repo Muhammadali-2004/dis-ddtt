@@ -177,12 +177,12 @@ include 'includes/header.php';
     <?php if($tab==='dash'): ?>
     <!-- Дашборд -->
     <div class="stats">
-      <div class="stat"><div class="ic">∑</div><div><div class="val"><?= $st['all'] ?></div><div class="lbl">Ҷамъи корҳо</div></div></div>
-      <div class="stat gold"><div class="ic">!</div><div><div class="val"><?= $st['pend'] ?></div><div class="lbl">Интизор</div></div></div>
+      <div class="stat"><div class="ic">❖</div><div><div class="val"><?= $st['all'] ?></div><div class="lbl">Ҷамъи корҳо</div></div></div>
+      <div class="stat gold"><div class="ic">◷</div><div><div class="val"><?= $st['pend'] ?></div><div class="lbl">Интизор</div></div></div>
       <div class="stat green"><div class="ic">✓</div><div><div class="val"><?= $st['appr'] ?></div><div class="lbl">Тасдиқ</div></div></div>
-      <div class="stat red"><div class="ic">×</div><div><div class="val"><?= $st['rej'] ?></div><div class="lbl">Рад</div></div></div>
-      <div class="stat"><div class="ic">У</div><div><div class="val"><?= $st['users'] ?></div><div class="lbl">Корбарон</div></div></div>
-      <div class="stat green"><div class="ic">↓</div><div><div class="val"><?= $st['dl'] ?></div><div class="lbl">Зеркашиҳо</div></div></div>
+      <div class="stat red"><div class="ic">⊘</div><div><div class="val"><?= $st['rej'] ?></div><div class="lbl">Рад</div></div></div>
+      <div class="stat"><div class="ic">◉</div><div><div class="val"><?= $st['users'] ?></div><div class="lbl">Корбарон</div></div></div>
+      <div class="stat green"><div class="ic">⇣</div><div><div class="val"><?= $st['dl'] ?></div><div class="lbl">Зеркашиҳо</div></div></div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
@@ -222,20 +222,23 @@ include 'includes/header.php';
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+    Chart.defaults.font.family = "'Manrope', 'Inter', sans-serif";
+    Chart.defaults.color = '#44516e';
     new Chart(chart_yr, {
       type: 'bar',
       data: {
         labels: <?= json_encode(array_column($chart_yr,'year')) ?>,
-        datasets:[{label:'Корҳо', data: <?= json_encode(array_column($chart_yr,'cnt')) ?>, backgroundColor:'#1e40af'}]
+        datasets:[{label:'Корҳо', data: <?= json_encode(array_column($chart_yr,'cnt')) ?>, backgroundColor:'#25406e', borderRadius:6, borderSkipped:false}]
       },
-      options:{plugins:{legend:{display:false}}, responsive:true}
+      options:{plugins:{legend:{display:false}}, responsive:true, scales:{y:{grid:{color:'#eef1f6'},ticks:{font:{size:12}}},x:{grid:{display:false},ticks:{font:{size:12}}}}}
     });
     new Chart(chart_tp, {
       type: 'doughnut',
       data: {
         labels: <?= json_encode(array_map(fn($r)=>$r['type'], $chart_tp)) ?>,
-        datasets:[{data: <?= json_encode(array_column($chart_tp,'cnt')) ?>, backgroundColor:['#1e40af','#3b82f6','#0a2c5e','#ca8a04','#10b981','#dc2626']}]
-      }
+        datasets:[{data: <?= json_encode(array_column($chart_tp,'cnt')) ?>, backgroundColor:['#25406e','#3a578c','#0e1c36','#b08940','#3d7a59','#a94348'], borderColor:'#ffffff', borderWidth:3}]
+      },
+      options:{plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:12,weight:'500'}}}}}
     });
     </script>
 
@@ -246,7 +249,7 @@ include 'includes/header.php';
       <div class="card-b">
         <?php $rows = $db->query("SELECT w.*, u.full_name student_name FROM works w LEFT JOIN students s ON s.id=w.student_id LEFT JOIN users u ON u.id=s.user_id WHERE w.status='pending' ORDER BY w.created_at ASC")->fetchAll(); ?>
         <?php if(empty($rows)): ?>
-        <div class="empty"><div class="ic">✓</div><h3>Ҳама тасдиқ шудааст!</h3></div>
+        <div class="empty"><div class="ic">❖</div><h3>Ҳама тасдиқ шудааст!</h3></div>
         <?php else: ?>
         <form method="POST">
           <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center;padding:12px;background:var(--gray-50);border:1px solid var(--gray-200)">

@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Қайд шудан — Архиви Корҳои Илмӣ</title>
-<link rel="stylesheet" href="<?= url('assets/css/style.css') ?>">
+<link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= @filemtime(__DIR__.'/assets/css/style.css') ?: time() ?>">
 </head>
 <body>
 <div class="auth-bg">

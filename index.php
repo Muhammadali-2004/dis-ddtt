@@ -44,19 +44,19 @@ include 'includes/header.php';
 
   <div class="stats">
     <div class="stat">
-      <div class="ic">К</div>
+      <div class="ic">❖</div>
       <div><div class="val"><?= number_format($total) ?></div><div class="lbl">Корҳои тасдиқшуда</div></div>
     </div>
     <div class="stat green">
-      <div class="ic"><?= date('y') ?></div>
+      <div class="ic">✦</div>
       <div><div class="val"><?= number_format($this_yr) ?></div><div class="lbl">Соли <?= date('Y') ?></div></div>
     </div>
     <div class="stat gold">
-      <div class="ic">Д</div>
+      <div class="ic">◉</div>
       <div><div class="val"><?= number_format($students) ?></div><div class="lbl">Донишҷӯён</div></div>
     </div>
     <div class="stat">
-      <div class="ic">З</div>
+      <div class="ic">⇣</div>
       <div><div class="val"><?= number_format($dloads) ?></div><div class="lbl">Зеркашиҳо</div></div>
     </div>
   </div>
@@ -73,7 +73,7 @@ include 'includes/header.php';
 
       <?php if (empty($recent)): ?>
       <div class="empty">
-        <div class="ic">∅</div>
+        <div class="ic">❍</div>
         <h3>Ҳанӯз кор вуҷуд надорад</h3>
         <p>Аввалин кор бор кунед!</p>
       </div>

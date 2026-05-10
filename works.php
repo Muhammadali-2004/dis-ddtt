@@ -152,7 +152,7 @@ include 'includes/header.php';
 
   <?php if (empty($works)): ?>
   <div class="empty">
-    <div class="ic">?</div>
+    <div class="ic">❍</div>
     <h3>Кор ёфт нашуд</h3>
     <p>Параметрҳои ҷустуҷӯро тағйир диҳед</p>
   </div>
