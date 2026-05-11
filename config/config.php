@@ -127,21 +127,27 @@ if (!function_exists('role_label')) {
 
 if (!function_exists('current_lang')) {
     function current_lang(): string {
+        static $resolved = null;
+        if ($resolved !== null) return $resolved;
+
         $supported = ['tg','ru','en'];
         if (session_status() === PHP_SESSION_NONE) @session_start();
+
         if (!empty($_GET['lang']) && in_array($_GET['lang'], $supported, true)) {
             $_SESSION['lang'] = $_GET['lang'];
-            setcookie('lang', $_GET['lang'], time()+86400*365, '/');
-            return $_GET['lang'];
+            if (!headers_sent()) {
+                @setcookie('lang', $_GET['lang'], time()+86400*365, '/');
+            }
+            return $resolved = $_GET['lang'];
         }
         if (!empty($_SESSION['lang']) && in_array($_SESSION['lang'], $supported, true)) {
-            return $_SESSION['lang'];
+            return $resolved = $_SESSION['lang'];
         }
         if (!empty($_COOKIE['lang']) && in_array($_COOKIE['lang'], $supported, true)) {
             $_SESSION['lang'] = $_COOKIE['lang'];
-            return $_COOKIE['lang'];
+            return $resolved = $_COOKIE['lang'];
         }
-        return 'tg';
+        return $resolved = 'tg';
     }
 }
 
@@ -169,9 +175,12 @@ if (!function_exists('t')) {
 
 if (!function_exists('lang_url')) {
     function lang_url(string $lang): string {
-        $q = $_GET; $q['lang'] = $lang;
+        $q = $_GET;
+        unset($q['lang']);
+        $q['lang'] = $lang;
         $self = basename($_SERVER['PHP_SELF']);
-        return url($self . '?' . http_build_query($q));
+        $qs = http_build_query($q);
+        return url($self . ($qs !== '' ? '?' . $qs : ''));
     }
 }
 
