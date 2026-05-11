@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
-$page_title = 'Архиви корҳо';
+$page_title = t('works.title');
 $db = db();
 
 $q    = trim($_GET['q'] ?? '');
@@ -8,12 +8,19 @@ $typ  = trim($_GET['typ'] ?? '');
 $yr   = intval($_GET['yr'] ?? 0);
 $fac  = intval($_GET['fac'] ?? 0);
 $spec = intval($_GET['spec'] ?? 0);
+$mine = !empty($_GET['mine']) && logged_in();
 $sort = in_array($_GET['s'] ?? '', ['new','old','views','dl']) ? $_GET['s'] : 'new';
 $page = max(1, intval($_GET['p'] ?? 1));
 $per  = 10;
 
-$where = ["w.status='approved'"];
+$where = [];
 $params = [];
+if ($mine) {
+    $where[] = "s.user_id = :cur_uid";
+    $params[':cur_uid'] = (int)$_SESSION['uid'];
+} else {
+    $where[] = "w.status='approved'";
+}
 
 if ($q) {
     $where[] = "(LOWER(w.title) LIKE LOWER(:q) OR LOWER(w.subject) LIKE LOWER(:q2) OR LOWER(w.keywords) LIKE LOWER(:q3) OR LOWER(u.full_name) LIKE LOWER(:q4))";
@@ -64,7 +71,10 @@ $stmt->bindValue(':off', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $works = $stmt->fetchAll();
 
-$years = $db->query("SELECT DISTINCT year FROM works WHERE status='approved' ORDER BY year DESC")->fetchAll(PDO::FETCH_COLUMN);
+$years_sql = $mine
+    ? "SELECT DISTINCT w.year FROM works w JOIN students s ON s.id=w.student_id WHERE s.user_id=".(int)$_SESSION['uid']." ORDER BY w.year DESC"
+    : "SELECT DISTINCT year FROM works WHERE status='approved' ORDER BY year DESC";
+$years = $db->query($years_sql)->fetchAll(PDO::FETCH_COLUMN);
 
 function qurl($extra=[]) {
     $p = array_merge($_GET, $extra);
@@ -78,72 +88,77 @@ include 'includes/header.php';
 <div class="wrap">
   <div class="page-title">
     <div>
-      <h2>Архиви Корҳои Илмӣ</h2>
-      <p><?= number_format($total) ?> кор ёфт шуд</p>
+      <h2><?= e($mine ? t('works.title.mine') : t('works.title')) ?></h2>
+      <p><?= e(t($mine ? 'works.count_mine' : 'works.count_one', ['n'=>number_format($total)])) ?></p>
     </div>
-    <?php if (logged_in()): ?>
-    <a href="<?= url('upload.php') ?>" class="btn btn-pri">Кори нав илова</a>
-    <?php endif; ?>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <?php if (logged_in()): ?>
+        <a href="<?= url('works.php') ?>" class="btn <?= $mine?'btn-out':'btn-dark' ?> btn-sm"><?= e(t('works.tab.all')) ?></a>
+        <a href="<?= url('works.php?mine=1') ?>" class="btn <?= $mine?'btn-dark':'btn-out' ?> btn-sm"><?= e(t('works.tab.mine')) ?></a>
+        <a href="<?= url('upload.php') ?>" class="btn btn-pri"><?= e(t('btn.new_work')) ?></a>
+      <?php endif; ?>
+    </div>
   </div>
 
   <div class="search-panel">
     <form method="GET" action="<?= url('works.php') ?>">
+      <?php if ($mine): ?><input type="hidden" name="mine" value="1"><?php endif; ?>
       <div class="search-grid">
         <div class="fg" style="margin:0">
-          <label>Ҷустуҷӯ</label>
-          <input type="text" name="q" class="fc" value="<?= e($q) ?>" placeholder="Унвон, муаллиф...">
+          <label><?= e(t('works.search')) ?></label>
+          <input type="text" name="q" class="fc" value="<?= e($q) ?>" placeholder="<?= e(t('works.search.placeholder')) ?>">
         </div>
         <div class="fg" style="margin:0">
-          <label>Намуди кор</label>
+          <label><?= e(t('works.type')) ?></label>
           <select name="typ" class="fc">
-            <option value="">Ҳама</option>
-            <option value="курсовая" <?= $typ==='курсовая'?'selected':'' ?>>Кори курсӣ</option>
-            <option value="дипломная" <?= $typ==='дипломная'?'selected':'' ?>>Кори дипломӣ</option>
-            <option value="магистр" <?= $typ==='магистр'?'selected':'' ?>>Магистрӣ</option>
-            <option value="мақола" <?= $typ==='мақола'?'selected':'' ?>>Мақола</option>
-            <option value="реферат" <?= $typ==='реферат'?'selected':'' ?>>Реферат</option>
+            <option value=""><?= e(t('work.type.any')) ?></option>
+            <option value="курсовая" <?= $typ==='курсовая'?'selected':'' ?>><?= e(t('work.type.course')) ?></option>
+            <option value="дипломная" <?= $typ==='дипломная'?'selected':'' ?>><?= e(t('work.type.diploma')) ?></option>
+            <option value="магистр" <?= $typ==='магистр'?'selected':'' ?>><?= e(t('work.type.master')) ?></option>
+            <option value="мақола" <?= $typ==='мақола'?'selected':'' ?>><?= e(t('work.type.article')) ?></option>
+            <option value="реферат" <?= $typ==='реферат'?'selected':'' ?>><?= e(t('work.type.referat')) ?></option>
           </select>
         </div>
         <div class="fg" style="margin:0">
-          <label>Сол</label>
+          <label><?= e(t('works.year')) ?></label>
           <select name="yr" class="fc">
-            <option value="">Ҳама</option>
+            <option value=""><?= e(t('work.type.any')) ?></option>
             <?php foreach ($years as $y): ?>
             <option value="<?= $y ?>" <?= $yr==$y?'selected':'' ?>><?= $y ?></option>
             <?php endforeach; ?>
           </select>
         </div>
         <div class="fg" style="margin:0">
-          <label>Факулта</label>
+          <label><?= e(t('works.faculty')) ?></label>
           <select name="fac" class="fc" id="fac_sel">
-            <option value="">Ҳама</option>
+            <option value=""><?= e(t('work.type.any')) ?></option>
             <?php foreach ($faculties as $f): ?>
             <option value="<?= $f['id'] ?>" <?= $fac==$f['id']?'selected':'' ?>><?= e($f['name']) ?></option>
             <?php endforeach; ?>
           </select>
         </div>
         <div class="fg" style="margin:0">
-          <label>Ихтисос</label>
+          <label><?= e(t('works.specialty')) ?></label>
           <select name="spec" class="fc" id="spec_sel">
-            <option value="">Ҳама</option>
+            <option value=""><?= e(t('work.type.any')) ?></option>
             <?php foreach ($specialties as $sp): ?>
             <option value="<?= $sp['id'] ?>" <?= $spec==$sp['id']?'selected':'' ?> data-fac="<?= $sp['faculty_id'] ?>"><?= e($sp['name']) ?></option>
             <?php endforeach; ?>
           </select>
         </div>
         <div class="fg" style="margin:0">
-          <label>Тартиб</label>
+          <label><?= e(t('works.order')) ?></label>
           <select name="s" class="fc">
-            <option value="new" <?= $sort==='new'?'selected':'' ?>>Навтарин</option>
-            <option value="old" <?= $sort==='old'?'selected':'' ?>>Кӯҳнатарин</option>
-            <option value="views" <?= $sort==='views'?'selected':'' ?>>Зиёд дида шуда</option>
-            <option value="dl" <?= $sort==='dl'?'selected':'' ?>>Зиёд зеркашӣ</option>
+            <option value="new" <?= $sort==='new'?'selected':'' ?>><?= e(t('works.sort.new')) ?></option>
+            <option value="old" <?= $sort==='old'?'selected':'' ?>><?= e(t('works.sort.old')) ?></option>
+            <option value="views" <?= $sort==='views'?'selected':'' ?>><?= e(t('works.sort.views')) ?></option>
+            <option value="dl" <?= $sort==='dl'?'selected':'' ?>><?= e(t('works.sort.dl')) ?></option>
           </select>
         </div>
         <div class="fg" style="margin:0;display:flex;gap:8px">
-          <button type="submit" class="btn btn-pri" style="flex:1">Ҷустуҷӯ</button>
+          <button type="submit" class="btn btn-pri" style="flex:1"><?= e(t('btn.search')) ?></button>
           <?php if ($q||$typ||$yr||$fac||$spec): ?>
-          <a href="<?= url('works.php') ?>" class="btn btn-ghost">×</a>
+          <a href="<?= url('works.php'.($mine?'?mine=1':'')) ?>" class="btn btn-ghost">×</a>
           <?php endif; ?>
         </div>
       </div>
@@ -153,8 +168,8 @@ include 'includes/header.php';
   <?php if (empty($works)): ?>
   <div class="empty">
     <div class="ic">❍</div>
-    <h3>Кор ёфт нашуд</h3>
-    <p>Параметрҳои ҷустуҷӯро тағйир диҳед</p>
+    <h3><?= e(t('works.empty.title')) ?></h3>
+    <p><?= e(t('works.empty.lead')) ?></p>
   </div>
   <?php else: ?>
   <div class="works-list">
@@ -164,24 +179,24 @@ include 'includes/header.php';
       <div class="body">
         <h3><a href="<?= url('view.php?id='.$w['id']) ?>"><?= e($w['title']) ?></a></h3>
         <div class="meta">
-          <span>Муаллиф: <strong><?= e($w['student_name'] ?? '—') ?></strong></span>
+          <span><?= e(t('works.item.author')) ?>: <strong><?= e($w['student_name'] ?? '—') ?></strong></span>
           <?php if ($w['teacher_name']): ?>
-          <span>Роҳбар: <?= e($w['teacher_name']) ?></span>
+          <span><?= e(t('works.item.teacher')) ?>: <?= e($w['teacher_name']) ?></span>
           <?php endif; ?>
-          <span>Соли <?= $w['year'] ?></span>
+          <span><?= e(t('works.item.year')) ?> <?= $w['year'] ?></span>
           <span><?= work_type_label($w['type']) ?></span>
           <?php if ($w['subject']): ?>
-          <span>Мавзӯъ: <?= e($w['subject']) ?></span>
+          <span><?= e(t('works.item.subject')) ?>: <?= e($w['subject']) ?></span>
           <?php endif; ?>
-          <span><?= $w['views'] ?> дидан</span>
-          <span><?= $w['downloads'] ?> зеркашӣ</span>
+          <span><?= $w['views'] ?> <?= e(t('works.item.views')) ?></span>
+          <span><?= $w['downloads'] ?> <?= e(t('works.item.downloads')) ?></span>
         </div>
       </div>
       <div class="right">
-        <span class="badge b-approved">Тасдиқ</span>
-        <a href="<?= url('view.php?id='.$w['id']) ?>" class="btn btn-pri btn-sm">Дидан</a>
-        <?php if ($w['file_path']): ?>
-        <a href="<?= url('download.php?id='.$w['id']) ?>" class="btn btn-out btn-sm">Зеркашӣ</a>
+        <span class="badge b-<?= e($w['status']) ?>"><?= e(status_label($w['status'])) ?></span>
+        <a href="<?= url('view.php?id='.$w['id']) ?>" class="btn btn-pri btn-sm"><?= e(t('btn.view')) ?></a>
+        <?php if ($w['file_path'] && ($w['status']==='approved' || $mine || can_review())): ?>
+        <a href="<?= url('download.php?id='.$w['id']) ?>" class="btn btn-out btn-sm"><?= e(t('btn.download')) ?></a>
         <?php endif; ?>
       </div>
     </div>

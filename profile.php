@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 require_login();
-$page_title = 'Профил';
+$page_title = t('profile.title');
 $db = db();
 $uid = $_SESSION['uid'];
 $err=''; $ok='';
@@ -11,9 +11,9 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     $phone = trim($_POST['phone']??'');
     $pass = $_POST['pass']??'';
     
-    if (!$name) $err='Ном ҳатмист';
+    if (!$name) $err=t('profile.required_name');
     else {
-        if ($pass && strlen($pass)<6) $err='Парол аз 6 ҳарф кам';
+        if ($pass && strlen($pass)<6) $err=t('profile.short_pass');
         else {
             if ($pass) {
                 $db->prepare("UPDATE users SET full_name=:n,phone=:p,password_hash=:h WHERE id=:i")
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
             }
             $_SESSION['uname']=$name;
             log_activity($uid, 'profile_update', '');
-            $ok='Профил нав шуд';
+            $ok=t('profile.updated');
         }
     }
 }
@@ -63,11 +63,11 @@ include 'includes/header.php';
 <div class="wrap">
   <div class="page-title">
     <div>
-      <h2>Профили ман</h2>
-      <p><span class="badge b-<?= e($user['role']) ?>"><?= e($user['role']) ?></span> · <?= e($user['email']) ?></p>
+      <h2><?= e(t('profile.title')) ?></h2>
+      <p><span class="badge b-<?= e($user['role']) ?>"><?= e(role_label($user['role'])) ?></span> · <?= e($user['email']) ?></p>
     </div>
     <?php if(is_student()): ?>
-    <a href="<?= url('upload.php') ?>" class="btn btn-pri">+ Кори нав</a>
+    <a href="<?= url('upload.php') ?>" class="btn btn-pri">+ <?= e(t('btn.new_work')) ?></a>
     <?php endif; ?>
   </div>
 
@@ -76,17 +76,29 @@ include 'includes/header.php';
 
   <?php if(!empty($notifs)): ?>
   <div class="card">
-    <div class="card-h">Огоҳиномаҳо (<?= count($notifs) ?>)</div>
+    <div class="card-h"><?= e(t('profile.notifs')) ?> (<?= count($notifs) ?>)</div>
     <div class="card-b" style="padding:0">
       <?php foreach($notifs as $n): ?>
       <div class="notif-item<?= !$n['is_read'] ? ' unread' : '' ?>">
-        <span class="badge <?= $n['type']==='approved'?'b-approved':'b-rejected' ?>">
-          <?= $n['type']==='approved' ? '✓ Тасдиқ' : '× Рад' ?>
-        </span>
+        <?php
+          $bcls = match($n['type']) {
+              'approved' => 'b-approved',
+              'rejected' => 'b-rejected',
+              'duplicate' => 'b-rejected',
+              default => 'b-admin'
+          };
+          $bkey = match($n['type']) {
+              'approved' => 'profile.notif.approved',
+              'rejected' => 'profile.notif.rejected',
+              'duplicate' => 'profile.notif.duplicate',
+              default => 'profile.notifs'
+          };
+        ?>
+        <span class="badge <?= $bcls ?>"><?= e(t($bkey)) ?></span>
         <span style="flex:1;font-size:14px"><?= e($n['message']) ?></span>
         <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
           <?php if($n['work_id']): ?>
-          <a href="<?= url('view.php?id='.$n['work_id']) ?>" class="btn btn-out btn-sm">Дидан</a>
+          <a href="<?= url('view.php?id='.$n['work_id']) ?>" class="btn btn-out btn-sm"><?= e(t('btn.view')) ?></a>
           <?php endif; ?>
           <time style="color:var(--gray-500);font-size:12px;white-space:nowrap"><?= time_ago($n['created_at']) ?></time>
         </div>
@@ -99,35 +111,35 @@ include 'includes/header.php';
   <div style="display:grid;grid-template-columns:1fr 2fr;gap:20px">
     <div>
       <div class="card">
-        <div class="card-h">Маълумоти шахсӣ</div>
+        <div class="card-h"><?= e(t('profile.personal')) ?></div>
         <div class="card-b">
           <form method="POST">
             <div class="fg">
-              <label>Ном ва насаб</label>
+              <label><?= e(t('profile.name')) ?></label>
               <input name="name" class="fc" value="<?= e($user['full_name']) ?>" required>
             </div>
             <div class="fg">
-              <label>Email</label>
+              <label><?= e(t('profile.email')) ?></label>
               <input class="fc" value="<?= e($user['email']) ?>" disabled>
             </div>
             <div class="fg">
-              <label>Телефон</label>
+              <label><?= e(t('profile.phone')) ?></label>
               <input name="phone" class="fc" value="<?= e($user['phone']??'') ?>">
             </div>
             <div class="fg">
-              <label>Парол нав (ихтиёрӣ)</label>
-              <input type="password" name="pass" class="fc" placeholder="Холӣ — танҳо нав не">
+              <label><?= e(t('profile.new_pass')) ?></label>
+              <input type="password" name="pass" class="fc" placeholder="<?= e(t('profile.new_pass.placeholder')) ?>">
             </div>
-            <button class="btn btn-pri btn-block">Нигоҳ доштан</button>
+            <button class="btn btn-pri btn-block"><?= e(t('profile.save')) ?></button>
           </form>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-h">★ Дилхоҳ (<?= count($favorites) ?>)</div>
+        <div class="card-h"><?= e(t('profile.fav')) ?> (<?= count($favorites) ?>)</div>
         <div class="card-b">
           <?php if(empty($favorites)): ?>
-          <p style="color:var(--gray-500);text-align:center">Дилхоҳ нест</p>
+          <p style="color:var(--gray-500);text-align:center"><?= e(t('profile.fav.empty')) ?></p>
           <?php else: foreach($favorites as $f): ?>
           <div style="padding:8px 0;border-bottom:1px solid var(--gray-100)">
             <a href="<?= url('view.php?id='.$f['id']) ?>" style="font-size:13px;font-weight:500"><?= e(mb_strimwidth($f['title'],0,40,'…')) ?></a>
@@ -140,20 +152,20 @@ include 'includes/header.php';
     <div>
       <div class="card">
         <div class="card-h">
-          <?php if(is_teacher()): ?>Корҳои донишҷӯёни ман<?php else: ?>Корҳои ман<?php endif; ?>
+          <?= e(is_teacher() ? t('profile.teacher_works') : t('profile.my_works')) ?>
           (<?= count($my_works) ?>)
         </div>
         <div class="card-b">
           <?php if(empty($my_works)): ?>
-          <div class="empty"><div class="ic">❍</div><h3>Кор вуҷуд надорад</h3>
+          <div class="empty"><div class="ic">❍</div><h3><?= e(t('profile.empty')) ?></h3>
           <?php if(is_student()): ?>
-          <a href="<?= url('upload.php') ?>" class="btn btn-pri" style="margin-top:14px">+ Кори нав</a>
+          <a href="<?= url('upload.php') ?>" class="btn btn-pri" style="margin-top:14px">+ <?= e(t('btn.new_work')) ?></a>
           <?php endif; ?>
           </div>
           <?php else: ?>
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Унвон</th><?php if(is_teacher()): ?><th>Донишҷӯ</th><?php endif; ?><th>Намуд</th><th>Сол</th><th>Ҳолат</th><th>Амал</th></tr></thead>
+              <thead><tr><th><?= e(t('profile.tbl.title')) ?></th><?php if(is_teacher()): ?><th><?= e(t('profile.tbl.student')) ?></th><?php endif; ?><th><?= e(t('profile.tbl.type')) ?></th><th><?= e(t('profile.tbl.year')) ?></th><th><?= e(t('profile.tbl.status')) ?></th><th><?= e(t('profile.tbl.action')) ?></th></tr></thead>
               <tbody>
                 <?php foreach($my_works as $w): ?>
                 <tr>
@@ -163,10 +175,10 @@ include 'includes/header.php';
                   <td><?= $w['year'] ?></td>
                   <td><span class="badge b-<?= $w['status'] ?>"><?= status_label($w['status']) ?></span></td>
                   <td>
-                    <a href="<?= url('view.php?id='.$w['id']) ?>" class="btn btn-pri btn-sm">Дидан</a>
+                    <a href="<?= url('view.php?id='.$w['id']) ?>" class="btn btn-pri btn-sm"><?= e(t('btn.view')) ?></a>
                     <?php if(is_teacher() && $w['status']==='pending'): ?>
-                    <a href="<?= url('admin.php?do=approve&id='.$w['id']) ?>" class="btn btn-success btn-sm" onclick="return confirm('Тасдиқ?')">✓</a>
-                    <a href="<?= url('admin.php?do=reject&id='.$w['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Рад?')">×</a>
+                    <a href="<?= url('admin.php?do=approve&id='.$w['id']) ?>" class="btn btn-success btn-sm" onclick="return confirm('<?= e(t('view.confirm.approve')) ?>')">✓</a>
+                    <a href="<?= url('admin.php?do=reject&id='.$w['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('<?= e(t('view.confirm.reject')) ?>')">×</a>
                     <?php endif; ?>
                   </td>
                 </tr>

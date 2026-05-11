@@ -44,6 +44,8 @@ if (!function_exists('db')) {
                     is_read BOOLEAN DEFAULT FALSE,
                     created_at TIMESTAMP DEFAULT NOW()
                 )");
+                $pdo->exec("ALTER TABLE works ADD COLUMN IF NOT EXISTS file_hash VARCHAR(64)");
+                $pdo->exec("CREATE INDEX IF NOT EXISTS idx_works_file_hash ON works(file_hash)");
             } catch (PDOException $e) {
                 die('<div style="font-family:Georgia,serif;padding:40px;background:#f8f9fa;color:#000;border:2px solid #1e40af;border-radius:4px;margin:40px auto;max-width:600px">
                     <h2 style="color:#1e40af;border-bottom:2px solid #1e40af;padding-bottom:10px">Хатои пайваст</h2>
@@ -90,11 +92,11 @@ if (!function_exists('time_ago')) {
 if (!function_exists('work_type_label')) {
     function work_type_label(?string $type): string {
         return match($type) {
-            'курсовая' => 'Кори курсӣ',
-            'дипломная' => 'Кори дипломӣ',
-            'магистр' => 'Магистрӣ',
-            'мақола' => 'Мақолаи илмӣ',
-            'реферат' => 'Реферат',
+            'курсовая' => t('work.type.course'),
+            'дипломная' => t('work.type.diploma'),
+            'магистр' => t('work.type.master'),
+            'мақола' => t('work.type.article'),
+            'реферат' => t('work.type.referat'),
             default => '—'
         };
     }
@@ -103,12 +105,73 @@ if (!function_exists('work_type_label')) {
 if (!function_exists('status_label')) {
     function status_label(?string $status): string {
         return match($status) {
-            'draft' => 'Лоиҳа',
-            'pending' => 'Дар интизор',
-            'approved' => 'Тасдиқшуда',
-            'rejected' => 'Радшуда',
+            'draft' => t('status.draft'),
+            'pending' => t('status.pending'),
+            'approved' => t('status.approved'),
+            'rejected' => t('status.rejected'),
             default => '—'
         };
+    }
+}
+
+if (!function_exists('role_label')) {
+    function role_label(?string $role): string {
+        return match($role) {
+            'admin' => t('role.admin'),
+            'teacher' => t('role.teacher'),
+            'student' => t('role.student'),
+            default => '—'
+        };
+    }
+}
+
+if (!function_exists('current_lang')) {
+    function current_lang(): string {
+        $supported = ['tg','ru','en'];
+        if (session_status() === PHP_SESSION_NONE) @session_start();
+        if (!empty($_GET['lang']) && in_array($_GET['lang'], $supported, true)) {
+            $_SESSION['lang'] = $_GET['lang'];
+            setcookie('lang', $_GET['lang'], time()+86400*365, '/');
+            return $_GET['lang'];
+        }
+        if (!empty($_SESSION['lang']) && in_array($_SESSION['lang'], $supported, true)) {
+            return $_SESSION['lang'];
+        }
+        if (!empty($_COOKIE['lang']) && in_array($_COOKIE['lang'], $supported, true)) {
+            $_SESSION['lang'] = $_COOKIE['lang'];
+            return $_COOKIE['lang'];
+        }
+        return 'tg';
+    }
+}
+
+if (!function_exists('lang_strings')) {
+    function lang_strings(?string $lang = null): array {
+        static $cache = [];
+        $lang = $lang ?: current_lang();
+        if (!isset($cache[$lang])) {
+            $f = __DIR__ . '/../lang/' . $lang . '.php';
+            $cache[$lang] = is_file($f) ? (require $f) : [];
+        }
+        return $cache[$lang];
+    }
+}
+
+if (!function_exists('t')) {
+    function t(string $key, array $vars = []): string {
+        $s = lang_strings()[$key] ?? lang_strings('tg')[$key] ?? $key;
+        if ($vars) {
+            foreach ($vars as $k => $v) $s = str_replace('{'.$k.'}', (string)$v, $s);
+        }
+        return $s;
+    }
+}
+
+if (!function_exists('lang_url')) {
+    function lang_url(string $lang): string {
+        $q = $_GET; $q['lang'] = $lang;
+        $self = basename($_SERVER['PHP_SELF']);
+        return url($self . '?' . http_build_query($q));
     }
 }
 

@@ -4,9 +4,20 @@ $db = db();
 $id = intval($_GET['id']??0);
 if (!$id) { header('Location: '.url('works.php')); exit; }
 
-$st = $db->prepare("SELECT * FROM works WHERE id=:i AND status='approved'");
-$st->execute([':i'=>$id]); $w = $st->fetch();
+$st = $db->prepare(
+    "SELECT w.*, s.user_id AS author_user_id
+     FROM works w
+     LEFT JOIN students s ON s.id = w.student_id
+     WHERE w.id = :i"
+);
+$st->execute([':i'=>$id]);
+$w = $st->fetch();
 if (!$w || !$w['file_path']) { header('Location: '.url('works.php')); exit; }
+
+$is_author = logged_in() && (int)($w['author_user_id'] ?? 0) === (int)($_SESSION['uid'] ?? -1);
+if ($w['status'] !== 'approved' && !can_review() && !$is_author) {
+    header('Location: '.url('works.php')); exit;
+}
 
 $path = realpath(UPLOAD_DIR . basename($w['file_path']));
 $upload_real = realpath(UPLOAD_DIR);

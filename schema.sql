@@ -72,6 +72,7 @@ CREATE TABLE works (
     file_path VARCHAR(500),
     file_name VARCHAR(255),
     file_size BIGINT,
+    file_hash VARCHAR(64),
     status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft','pending','approved','rejected')),
     grade VARCHAR(20),
     rejection_reason TEXT,
@@ -81,6 +82,8 @@ CREATE TABLE works (
     approved_at TIMESTAMP,
     approved_by INT REFERENCES users(id)
 );
+
+CREATE INDEX IF NOT EXISTS idx_works_file_hash ON works(file_hash);
 
 CREATE TABLE comments (
     id SERIAL PRIMARY KEY,

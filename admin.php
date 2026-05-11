@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 require_review();
-$page_title = 'Панели идора';
+$page_title = is_admin() ? t('admin.panel.admin') : t('admin.panel.review');
 $db = db();
 $tab = $_GET['tab']??'dash';
 $msg = $_GET['msg']??'';
@@ -146,28 +146,28 @@ include 'includes/header.php';
 
 <div class="wrap">
   <div class="page-title">
-    <div><h2>Панели <?= is_admin()?'Идора':'Тафтиш' ?></h2><p>Идоракунӣ ва тафтиши корҳо</p></div>
+    <div><h2><?= e(is_admin() ? t('admin.panel.admin') : t('admin.panel.review')) ?></h2><p><?= e(t('admin.panel.lead')) ?></p></div>
     <?php if(is_admin()): ?>
-    <a href="<?= url('admin.php?tab=users') ?>" class="btn btn-pri">+ Илова кардани корбар</a>
+    <a href="<?= url('admin.php?tab=users') ?>" class="btn btn-pri"><?= e(t('admin.add_user')) ?></a>
     <?php endif; ?>
   </div>
 
-  <?php if($msg==='ok'): ?><div class="alert alert-ok">Кор тасдиқ шуд</div><?php endif; ?>
-  <?php if($msg==='rej'): ?><div class="alert alert-warn">Кор рад шуд</div><?php endif; ?>
-  <?php if($msg==='del'): ?><div class="alert alert-err">Кор ҳазф шуд</div><?php endif; ?>
-  <?php if($msg==='added'): ?><div class="alert alert-ok">Корбар илова шуд</div><?php endif; ?>
-  <?php if($msg==='role'): ?><div class="alert alert-info">Нақш иваз шуд</div><?php endif; ?>
+  <?php if($msg==='ok'): ?><div class="alert alert-ok"><?= e(t('admin.msg.ok')) ?></div><?php endif; ?>
+  <?php if($msg==='rej'): ?><div class="alert alert-warn"><?= e(t('admin.msg.rej')) ?></div><?php endif; ?>
+  <?php if($msg==='del'): ?><div class="alert alert-err"><?= e(t('admin.msg.del')) ?></div><?php endif; ?>
+  <?php if($msg==='added'): ?><div class="alert alert-ok"><?= e(t('admin.msg.added')) ?></div><?php endif; ?>
+  <?php if($msg==='role'): ?><div class="alert alert-info"><?= e(t('admin.msg.role')) ?></div><?php endif; ?>
 
   <div class="layout-sidebar">
     <div class="sidebar">
-      <div class="sb-h">Меню</div>
+      <div class="sb-h"><?= e(t('admin.menu')) ?></div>
       <ul class="sb-menu">
-        <li><a href="<?= url('admin.php?tab=dash') ?>" <?= $tab==='dash'?'class="on"':'' ?>>Умумӣ</a></li>
-        <li><a href="<?= url('admin.php?tab=pend') ?>" <?= $tab==='pend'?'class="on"':'' ?>>Интизор<?= $st['pend']>0?'<span class="count">'.$st['pend'].'</span>':'' ?></a></li>
-        <li><a href="<?= url('admin.php?tab=all') ?>" <?= $tab==='all'?'class="on"':'' ?>>Ҳамаи корҳо</a></li>
+        <li><a href="<?= url('admin.php?tab=dash') ?>" <?= $tab==='dash'?'class="on"':'' ?>><?= e(t('admin.tab.dash')) ?></a></li>
+        <li><a href="<?= url('admin.php?tab=pend') ?>" <?= $tab==='pend'?'class="on"':'' ?>><?= e(t('admin.tab.pend')) ?><?= $st['pend']>0?'<span class="count">'.$st['pend'].'</span>':'' ?></a></li>
+        <li><a href="<?= url('admin.php?tab=all') ?>" <?= $tab==='all'?'class="on"':'' ?>><?= e(t('admin.tab.all')) ?></a></li>
         <?php if(is_admin()): ?>
-        <li><a href="<?= url('admin.php?tab=users') ?>" <?= $tab==='users'?'class="on"':'' ?>>Корбарон</a></li>
-        <li><a href="<?= url('admin.php?tab=log') ?>" <?= $tab==='log'?'class="on"':'' ?>>Логи фаъолият</a></li>
+        <li><a href="<?= url('admin.php?tab=users') ?>" <?= $tab==='users'?'class="on"':'' ?>><?= e(t('admin.tab.users')) ?></a></li>
+        <li><a href="<?= url('admin.php?tab=log') ?>" <?= $tab==='log'?'class="on"':'' ?>><?= e(t('admin.tab.log')) ?></a></li>
         <?php endif; ?>
       </ul>
     </div>
@@ -211,7 +211,7 @@ include 'includes/header.php';
                 <td><?= $r['year'] ?></td>
                 <td><span class="badge b-<?= $r['status'] ?>"><?= status_label($r['status']) ?></span></td>
                 <td><?= date('d.m.Y',strtotime($r['created_at'])) ?></td>
-                <td><a href="<?= url('view.php?id='.$r['id']) ?>" class="btn btn-pri btn-sm">Дидан</a></td>
+                <td><a href="<?= url('view.php?id='.$r['id']) ?>" class="btn btn-pri btn-sm"><?= e(t('btn.view')) ?></a></td>
               </tr>
               <?php endforeach; ?>
             </tbody>
@@ -313,7 +313,7 @@ include 'includes/header.php';
                 <td><?= $r['views'] ?></td>
                 <td><?= $r['downloads'] ?></td>
                 <td>
-                  <a href="<?= url('view.php?id='.$r['id']) ?>" class="btn btn-pri btn-sm">Дидан</a>
+                  <a href="<?= url('view.php?id='.$r['id']) ?>" class="btn btn-pri btn-sm"><?= e(t('btn.view')) ?></a>
                   <?php if(is_admin()): ?>
                   <a href="<?= url('admin.php?do=del&id='.$r['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Ҳазф?')">Ҳазф</a>
                   <?php endif; ?>
@@ -387,9 +387,9 @@ include 'includes/header.php';
                 <td><?= e($u['full_name']) ?></td>
                 <td><?= e($u['email']) ?></td>
                 <td>
-                  <span class="badge b-<?= e($u['role']) ?>"><?= e($u['role']) ?></span>
+                  <span class="badge b-<?= e($u['role']) ?>"><?= e(role_label($u['role'])) ?></span>
                 </td>
-                <td><?= $u['is_active']?'<span class="badge b-approved">Фаъол</span>':'<span class="badge b-rejected">Блок</span>' ?></td>
+                <td><?= $u['is_active']?'<span class="badge b-approved">'.e(t('btn.unblock')).'</span>':'<span class="badge b-rejected">'.e(t('btn.block')).'</span>' ?></td>
                 <td><?= date('d.m.Y',strtotime($u['created_at'])) ?></td>
                 <td>
                   <?php if($u['id']!=$_SESSION['uid']): ?>
@@ -400,9 +400,9 @@ include 'includes/header.php';
                     <option value="student" <?= $u['role']==='student'?'disabled':'' ?>>Student</option>
                   </select>
                   <?php if($u['is_active']): ?>
-                  <a href="<?= url('admin.php?do=block&id='.$u['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Блок?')">Блок</a>
+                  <a href="<?= url('admin.php?do=block&id='.$u['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('<?= e(t('btn.block')) ?>?')"><?= e(t('btn.block')) ?></a>
                   <?php else: ?>
-                  <a href="<?= url('admin.php?do=unblock&id='.$u['id']) ?>" class="btn btn-success btn-sm">Фаъол</a>
+                  <a href="<?= url('admin.php?do=unblock&id='.$u['id']) ?>" class="btn btn-success btn-sm"><?= e(t('btn.unblock')) ?></a>
                   <?php endif; ?>
                   <?php endif; ?>
                 </td>

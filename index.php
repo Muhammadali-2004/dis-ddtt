@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
-$page_title = 'Саҳифаи асосӣ';
+$page_title = t('nav.home');
 $db = db();
 
 $total    = (int)$db->query("SELECT COUNT(*) FROM works WHERE status='approved'")->fetchColumn();
@@ -31,11 +31,11 @@ include 'includes/header.php';
 
 <section class="hero">
   <div class="hero-inner">
-    <h1>Архиви Корҳои Илмии Донишҷӯён</h1>
-    <p>Системаи иттилоотии расмии нигоҳдорӣ ва дастрасии корҳои илмии донишҷӯён — рисолаҳо, корҳои курсӣ ва мақолаҳо.</p>
+    <h1><?= e(t('home.hero.title')) ?></h1>
+    <p><?= e(t('home.hero.lead')) ?></p>
     <form action="<?= url('works.php') ?>" method="GET" class="hero-search">
-      <input name="q" placeholder="Ҷустуҷӯ: унвон, муаллиф, мавзӯъ, калидвожа...">
-      <button type="submit">Ҷустуҷӯ</button>
+      <input name="q" placeholder="<?= e(t('home.hero.search_placeholder')) ?>">
+      <button type="submit"><?= e(t('btn.search')) ?></button>
     </form>
   </div>
 </section>
@@ -45,19 +45,19 @@ include 'includes/header.php';
   <div class="stats">
     <div class="stat">
       <div class="ic">❖</div>
-      <div><div class="val"><?= number_format($total) ?></div><div class="lbl">Корҳои тасдиқшуда</div></div>
+      <div><div class="val"><?= number_format($total) ?></div><div class="lbl"><?= e(t('home.stat.approved')) ?></div></div>
     </div>
     <div class="stat green">
       <div class="ic">✦</div>
-      <div><div class="val"><?= number_format($this_yr) ?></div><div class="lbl">Соли <?= date('Y') ?></div></div>
+      <div><div class="val"><?= number_format($this_yr) ?></div><div class="lbl"><?= e(t('home.stat.this_year')) ?> <?= date('Y') ?></div></div>
     </div>
     <div class="stat gold">
       <div class="ic">◉</div>
-      <div><div class="val"><?= number_format($students) ?></div><div class="lbl">Донишҷӯён</div></div>
+      <div><div class="val"><?= number_format($students) ?></div><div class="lbl"><?= e(t('home.stat.students')) ?></div></div>
     </div>
     <div class="stat">
       <div class="ic">⇣</div>
-      <div><div class="val"><?= number_format($dloads) ?></div><div class="lbl">Зеркашиҳо</div></div>
+      <div><div class="val"><?= number_format($dloads) ?></div><div class="lbl"><?= e(t('home.stat.downloads')) ?></div></div>
     </div>
   </div>
 
@@ -65,17 +65,17 @@ include 'includes/header.php';
     <div>
       <div class="page-title">
         <div>
-          <h2>Охирин корҳои тасдиқшуда</h2>
-          <p>5 кори охирини иловашуда</p>
+          <h2><?= e(t('home.recent.title')) ?></h2>
+          <p><?= e(t('home.recent.subtitle')) ?></p>
         </div>
-        <a href="<?= url('works.php') ?>" class="btn btn-out btn-sm">Ҳамаи корҳо →</a>
+        <a href="<?= url('works.php') ?>" class="btn btn-out btn-sm"><?= e(t('home.recent.all')) ?></a>
       </div>
 
       <?php if (empty($recent)): ?>
       <div class="empty">
         <div class="ic">❍</div>
-        <h3>Ҳанӯз кор вуҷуд надорад</h3>
-        <p>Аввалин кор бор кунед!</p>
+        <h3><?= e(t('home.empty.title')) ?></h3>
+        <p><?= e(t('home.empty.lead')) ?></p>
       </div>
       <?php else: ?>
       <div class="works-list">
@@ -85,18 +85,18 @@ include 'includes/header.php';
           <div class="body">
             <h3><a href="<?= url('view.php?id='.$w['id']) ?>"><?= e($w['title']) ?></a></h3>
             <div class="meta">
-              <span>Муаллиф: <?= e($w['student_name'] ?? '—') ?></span>
+              <span><?= e(t('works.item.author')) ?>: <?= e($w['student_name'] ?? '—') ?></span>
               <?php if ($w['teacher_name']): ?>
-              <span>Роҳбар: <?= e($w['teacher_name']) ?></span>
+              <span><?= e(t('works.item.teacher')) ?>: <?= e($w['teacher_name']) ?></span>
               <?php endif; ?>
-              <span>Соли <?= $w['year'] ?></span>
+              <span><?= e(t('works.item.year')) ?> <?= $w['year'] ?></span>
               <span><?= work_type_label($w['type']) ?></span>
-              <span><?= $w['views'] ?> дидан</span>
+              <span><?= $w['views'] ?> <?= e(t('works.item.views')) ?></span>
             </div>
           </div>
           <div class="right">
-            <span class="badge b-approved">Тасдиқшуда</span>
-            <a href="<?= url('view.php?id='.$w['id']) ?>" class="btn btn-pri btn-sm">Дидан</a>
+            <span class="badge b-approved"><?= e(t('status.approved')) ?></span>
+            <a href="<?= url('view.php?id='.$w['id']) ?>" class="btn btn-pri btn-sm"><?= e(t('btn.view')) ?></a>
           </div>
         </div>
         <?php endforeach; ?>
@@ -106,10 +106,10 @@ include 'includes/header.php';
 
     <div>
       <div class="card">
-        <div class="card-h">Корҳо аз рӯи намуд</div>
+        <div class="card-h"><?= e(t('home.by_type')) ?></div>
         <div class="card-b">
           <?php if (empty($by_type)): ?>
-          <p style="color:var(--gray-500);font-size:14px;text-align:center">Маълумот нест</p>
+          <p style="color:var(--gray-500);font-size:14px;text-align:center"><?= e(t('home.no_data')) ?></p>
           <?php else: foreach ($by_type as $bt): ?>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-100)">
             <span style="font-size:14px"><?= work_type_label($bt['type']) ?></span>
@@ -121,22 +121,22 @@ include 'includes/header.php';
 
       <?php if (!logged_in()): ?>
       <div class="card">
-        <div class="card-h">Иштирок кунед</div>
+        <div class="card-h"><?= e(t('home.join.title')) ?></div>
         <div class="card-b">
           <p style="font-size:14px;color:var(--gray-700);margin-bottom:16px">
-            Барои бор кардани кор ва дастрасии пурра ба архив, дар система қайд шавед.
+            <?= e(t('home.join.lead')) ?>
           </p>
-          <a href="<?= url('register.php') ?>" class="btn btn-pri btn-block" style="margin-bottom:8px">Қайд шудан</a>
-          <a href="<?= url('login.php') ?>" class="btn btn-out btn-block">Дохил шудан</a>
+          <a href="<?= url('register.php') ?>" class="btn btn-pri btn-block" style="margin-bottom:8px"><?= e(t('nav.register')) ?></a>
+          <a href="<?= url('login.php') ?>" class="btn btn-out btn-block"><?= e(t('nav.login')) ?></a>
         </div>
       </div>
       <?php else: ?>
       <div class="card">
-        <div class="card-h">Амалиётҳои зуд</div>
+        <div class="card-h"><?= e(t('home.quick.title')) ?></div>
         <div class="card-b">
-          <a href="<?= url('upload.php') ?>" class="btn btn-pri btn-block" style="margin-bottom:10px">Кори нав илова</a>
-          <a href="<?= url('works.php') ?>" class="btn btn-out btn-block" style="margin-bottom:10px">Архиви пурра</a>
-          <a href="<?= url('profile.php') ?>" class="btn btn-ghost btn-block">Профили ман</a>
+          <a href="<?= url('upload.php') ?>" class="btn btn-pri btn-block" style="margin-bottom:10px"><?= e(t('btn.new_work')) ?></a>
+          <a href="<?= url('works.php') ?>" class="btn btn-out btn-block" style="margin-bottom:10px"><?= e(t('home.quick.archive')) ?></a>
+          <a href="<?= url('profile.php') ?>" class="btn btn-ghost btn-block"><?= e(t('home.quick.profile')) ?></a>
         </div>
       </div>
       <?php endif; ?>

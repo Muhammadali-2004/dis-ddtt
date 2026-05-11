@@ -76,14 +76,14 @@ include 'includes/header.php';
 
 <div class="wrap" style="max-width:980px">
   <div class="breadcrumb">
-    <a href="<?= url('index.php') ?>">Асосӣ</a><span>›</span>
-    <a href="<?= url('works.php') ?>">Архив</a><span>›</span>
+    <a href="<?= url('index.php') ?>"><?= e(t('view.bc.home')) ?></a><span>›</span>
+    <a href="<?= url('works.php') ?>"><?= e(t('view.bc.archive')) ?></a><span>›</span>
     <?= e(mb_strimwidth($w['title'],0,60,'…')) ?>
   </div>
 
-  <?php if($w['status']==='pending'): ?><div class="alert alert-warn">Кор дар интизори тасдиқ аст</div><?php endif; ?>
+  <?php if($w['status']==='pending'): ?><div class="alert alert-warn"><?= e(t('view.pending_alert')) ?></div><?php endif; ?>
   <?php if($w['status']==='rejected'): ?>
-  <div class="alert alert-err">Кор рад карда шудааст<?= $w['rejection_reason']?': '.e($w['rejection_reason']):'' ?></div>
+  <div class="alert alert-err"><?= e(t('view.rejected_alert')) ?><?= $w['rejection_reason']?': '.e($w['rejection_reason']):'' ?></div>
   <?php endif; ?>
 
   <div class="card">
@@ -95,30 +95,30 @@ include 'includes/header.php';
       <h1 style="font-family:var(--font-head);font-size:24px;color:var(--blue-dark);margin-bottom:14px;line-height:1.3"><?= e($w['title']) ?></h1>
       
       <div class="info-grid">
-        <div class="it"><div class="lbl">Муаллиф</div><div class="val"><?= e($w['student_name'] ?? '—') ?></div></div>
+        <div class="it"><div class="lbl"><?= e(t('view.author')) ?></div><div class="val"><?= e($w['student_name'] ?? '—') ?></div></div>
         <?php if($w['teacher_name']): ?>
-        <div class="it"><div class="lbl">Роҳбари илмӣ</div><div class="val"><?= e($w['teacher_name']) ?></div></div>
+        <div class="it"><div class="lbl"><?= e(t('view.teacher')) ?></div><div class="val"><?= e($w['teacher_name']) ?></div></div>
         <?php endif; ?>
         <?php if($w['faculty_name']): ?>
-        <div class="it"><div class="lbl">Факулта</div><div class="val"><?= e($w['faculty_name']) ?></div></div>
+        <div class="it"><div class="lbl"><?= e(t('view.faculty')) ?></div><div class="val"><?= e($w['faculty_name']) ?></div></div>
         <?php endif; ?>
         <?php if($w['group_name']): ?>
-        <div class="it"><div class="lbl">Гурӯҳ</div><div class="val"><?= e($w['group_name']) ?></div></div>
+        <div class="it"><div class="lbl"><?= e(t('view.group')) ?></div><div class="val"><?= e($w['group_name']) ?></div></div>
         <?php endif; ?>
-        <div class="it"><div class="lbl">Сол</div><div class="val"><?= $w['year'] ?></div></div>
+        <div class="it"><div class="lbl"><?= e(t('view.year')) ?></div><div class="val"><?= $w['year'] ?></div></div>
         <?php if($w['subject']): ?>
-        <div class="it"><div class="lbl">Мавзӯъ</div><div class="val"><?= e($w['subject']) ?></div></div>
+        <div class="it"><div class="lbl"><?= e(t('view.subject')) ?></div><div class="val"><?= e($w['subject']) ?></div></div>
         <?php endif; ?>
         <?php if($w['grade']): ?>
-        <div class="it"><div class="lbl">Баҳо</div><div class="val"><?= e($w['grade']) ?></div></div>
+        <div class="it"><div class="lbl"><?= e(t('view.grade')) ?></div><div class="val"><?= e($w['grade']) ?></div></div>
         <?php endif; ?>
-        <div class="it"><div class="lbl">Дидан</div><div class="val"><?= $w['views'] ?></div></div>
-        <div class="it"><div class="lbl">Зеркашӣ</div><div class="val"><?= $w['downloads'] ?></div></div>
+        <div class="it"><div class="lbl"><?= e(t('view.views')) ?></div><div class="val"><?= $w['views'] ?></div></div>
+        <div class="it"><div class="lbl"><?= e(t('view.downloads')) ?></div><div class="val"><?= $w['downloads'] ?></div></div>
       </div>
 
       <?php if($w['keywords']): ?>
       <div style="margin-top:14px">
-        <div style="font-size:12px;text-transform:uppercase;color:var(--gray-500);margin-bottom:8px;letter-spacing:.5px">Калидвожаҳо</div>
+        <div style="font-size:12px;text-transform:uppercase;color:var(--gray-500);margin-bottom:8px;letter-spacing:.5px"><?= e(t('view.keywords')) ?></div>
         <?php foreach(explode(',',$w['keywords']) as $kw): ?>
         <a href="<?= url('works.php?q='.urlencode(trim($kw))) ?>" style="display:inline-block;padding:4px 12px;background:var(--blue-bg);border:1px solid var(--blue-light);font-size:12px;color:var(--blue-dark);margin:2px;text-decoration:none"><?= e(trim($kw)) ?></a>
         <?php endforeach; ?>
@@ -127,59 +127,63 @@ include 'includes/header.php';
 
       <?php if($w['description']): ?>
       <div style="margin-top:20px;padding:18px;background:var(--gray-50);border-left:4px solid var(--blue)">
-        <div style="font-size:12px;text-transform:uppercase;color:var(--gray-500);margin-bottom:8px;font-weight:600">Аннотатсия</div>
+        <div style="font-size:12px;text-transform:uppercase;color:var(--gray-500);margin-bottom:8px;font-weight:600"><?= e(t('view.annotation')) ?></div>
         <p style="line-height:1.7"><?= nl2br(e($w['description'])) ?></p>
       </div>
       <?php endif; ?>
 
       <?php if($w['status']==='approved' && logged_in()): ?>
       <div style="margin-top:20px;padding:14px;border:1px solid var(--gray-200)">
-        <div style="font-size:12px;text-transform:uppercase;color:var(--gray-500);margin-bottom:8px;font-weight:600">Реитинги шумо</div>
+        <div style="font-size:12px;text-transform:uppercase;color:var(--gray-500);margin-bottom:8px;font-weight:600"><?= e(t('view.my_rating')) ?></div>
         <form method="POST" style="display:inline-flex;gap:6px">
           <?php for($s=1;$s<=5;$s++): ?>
           <button type="submit" name="rating" value="<?= $s ?>" style="background:none;border:none;font-size:24px;color:var(--gold);cursor:pointer;padding:0">★</button>
           <?php endfor; ?>
         </form>
         <span style="margin-left:14px;color:var(--gray-500);font-size:13px">
-          Реитинги миёна: <?= $rating['avg']?number_format($rating['avg'],1):'—' ?> (<?= $rating['cnt'] ?> овоз)
+          <?= e(t('view.avg_rating')) ?>: <?= $rating['avg']?number_format($rating['avg'],1):'—' ?> (<?= $rating['cnt'] ?> <?= e(t('view.votes')) ?>)
         </span>
       </div>
       <?php endif; ?>
 
       <div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;padding-top:20px;border-top:2px solid var(--gray-200)">
-        <?php if($w['file_path'] && $w['status']==='approved'): ?>
-        <a href="<?= url('download.php?id='.$id) ?>" class="btn btn-pri btn-lg">Зеркашии файл (<?= filesize_human($w['file_size']) ?>)</a>
+        <?php
+        $is_author = logged_in() && (current_user()['id'] ?? 0) === ($w['author_user_id'] ?? -1);
+        $can_dl = $w['file_path'] && ($w['status']==='approved' || can_review() || $is_author);
+        ?>
+        <?php if($can_dl): ?>
+        <a href="<?= url('download.php?id='.$id) ?>" class="btn btn-pri btn-lg"><?= e(t('view.download_btn')) ?> (<?= filesize_human($w['file_size']) ?>)</a>
         <?php endif; ?>
         <?php if(logged_in()): ?>
-        <a href="<?= url('view.php?id='.$id.'&fav=1') ?>" class="btn <?= $is_fav?'btn-dark':'btn-out' ?>"><?= $is_fav?'★ Дилхоҳ':'☆ Илова ба дилхоҳ' ?></a>
+        <a href="<?= url('view.php?id='.$id.'&fav=1') ?>" class="btn <?= $is_fav?'btn-dark':'btn-out' ?>"><?= e($is_fav?t('view.fav_on'):t('view.fav_off')) ?></a>
         <?php endif; ?>
         <?php if(can_review() && $w['status']==='pending'): ?>
-        <a href="<?= url('admin.php?do=approve&id='.$id) ?>" class="btn btn-success" onclick="return confirm('Тасдиқ?')">Тасдиқ</a>
-        <a href="<?= url('admin.php?do=reject&id='.$id) ?>" class="btn btn-danger" onclick="return confirm('Рад?')">Рад</a>
+        <a href="<?= url('admin.php?do=approve&id='.$id) ?>" class="btn btn-success" onclick="return confirm('<?= e(t('view.confirm.approve')) ?>')"><?= e(t('btn.approve')) ?></a>
+        <a href="<?= url('admin.php?do=reject&id='.$id) ?>" class="btn btn-danger" onclick="return confirm('<?= e(t('view.confirm.reject')) ?>')"><?= e(t('btn.reject')) ?></a>
         <?php endif; ?>
-        <a href="<?= url('works.php') ?>" class="btn btn-ghost">← Бозгашт</a>
+        <a href="<?= url('works.php') ?>" class="btn btn-ghost"><?= e(t('btn.back')) ?></a>
       </div>
     </div>
   </div>
 
   <div class="card" id="comments">
-    <div class="card-h">Тавзеҳот (<?= count($comments) ?>)</div>
+    <div class="card-h"><?= e(t('view.comments')) ?> (<?= count($comments) ?>)</div>
     <div class="card-b">
       <?php if(logged_in()): ?>
       <form method="POST" style="margin-bottom:20px">
-        <textarea name="comment" class="fc" rows="3" placeholder="Тавзеҳи худро нависед..." required></textarea>
-        <button class="btn btn-pri" style="margin-top:10px">Илова кардан</button>
+        <textarea name="comment" class="fc" rows="3" placeholder="<?= e(t('view.comment.placeholder')) ?>" required></textarea>
+        <button class="btn btn-pri" style="margin-top:10px"><?= e(t('view.comment.add')) ?></button>
       </form>
       <?php else: ?>
-      <div class="alert alert-info">Барои гузоштани тавзеҳ <a href="<?= url('login.php') ?>">дохил шавед</a></div>
+      <div class="alert alert-info"><?= e(t('view.comment.login')) ?> <a href="<?= url('login.php') ?>"><?= e(t('view.comment.login_link')) ?></a></div>
       <?php endif; ?>
 
       <?php if(empty($comments)): ?>
-      <p style="color:var(--gray-500);text-align:center;padding:20px">Ҳанӯз тавзеҳ нест</p>
+      <p style="color:var(--gray-500);text-align:center;padding:20px"><?= e(t('view.comment.empty')) ?></p>
       <?php else: foreach($comments as $c): ?>
       <div class="comment">
         <div class="h">
-          <b><?= e($c['full_name']) ?> <span class="badge b-<?= e($c['role']) ?>" style="margin-left:6px"><?= e($c['role']) ?></span></b>
+          <b><?= e($c['full_name']) ?> <span class="badge b-<?= e($c['role']) ?>" style="margin-left:6px"><?= e(role_label($c['role'])) ?></span></b>
           <time><?= time_ago($c['created_at']) ?></time>
         </div>
         <p><?= nl2br(e($c['content'])) ?></p>
